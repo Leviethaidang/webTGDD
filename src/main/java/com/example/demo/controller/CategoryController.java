@@ -1,22 +1,12 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.Category;
-import com.example.demo.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import jakarta.validation.Valid;
-
 @Controller
 @RequestMapping("/categories")
 public class CategoryController {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+
+    public CategoryController(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
@@ -27,9 +17,22 @@ public class CategoryController {
     @PostMapping("/add")
     public String addCategory(@Valid Category category, BindingResult result, Model model) {
         if (result.hasErrors()) {
+            return "category-form"; // form sẽ hiển thị lỗi validation
+        }
+
+        try {
+            categoryRepository.save(category);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Không thể lưu danh mục: " + e.getMessage());
             return "category-form";
         }
-        categoryRepository.save(category);
-        return "redirect:/products";
+
+        return "redirect:/categories/list"; // redirect về danh sách category
+    }
+
+    @GetMapping("/list")
+    public String listCategories(Model model) {
+        model.addAttribute("categories", categoryRepository.findAll());
+        return "category-list"; // view hiển thị tất cả category
     }
 }
