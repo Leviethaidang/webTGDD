@@ -9,7 +9,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "bắt buộc nhập tên ")
+    @NotBlank(message = "Tên là bắt buộc")
     private String name;
 
     public Long getId() {
