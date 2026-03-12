@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+
+<head>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="container py-5">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="mb-4">
+                        <i class="fas fa-shopping-cart"></i> Giỏ hàng của bạn
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Empty Cart Message -->
+            <div th:if="${cartItems.isEmpty()}" class="alert alert-info text-center py-4">
+                <i class="fas fa-inbox" style="font-size: 3rem; color: #6c757d;"></i>
+                <p class="mt-3 mb-0">Giỏ hàng của bạn trống</p>
+                <a href="/products" class="btn btn-primary mt-3">
+                    <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+
+            <!-- Cart Items -->
+            <div th:if="${!cartItems.isEmpty()}" class="row">
+                <div class="col-lg-8">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Giá</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-right">Thành tiền</th>
+                                    <th class="text-center">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${cartItems}">
+                                    <!-- Product Info -->
+                                    <td>
+                                        <div class="d-flex align-items-center" style="gap: 15px;">
+                                            <img th:src="@{${item.image != null ? item.image : 'https://placehold.co/80x80'}}"
+                                                alt="Product Image" style="width: 80px; height: 80px; object-fit: contain; border-radius: 4px;">
+                                            <div>
+                                                <h6 class="mb-1" th:text="${item.productName}"></h6>
+                                                <small class="text-muted">ID: <span th:text="${item.productId}"></span></small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Price -->
+                                    <td class="text-center align-middle">
+                                        <span class="text-danger fw-bold"
+                                            th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                    </td>
+
+                                    <!-- Quantity -->
+                                    <td class="align-middle">
+                                        <div class="d-flex justify-content-center align-items-center" style="gap: 8px;">
+                                            <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post" style="display: inline;">
+                                                <button type="submit" name="quantity" th:value="${item.quantity - 1}" class="btn btn-sm btn-outline-secondary" th:disabled="${item.quantity <= 1}">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </form>
+                                            <input type="number" class="form-control text-center" style="width: 60px; padding: 0.25rem;" th:value="${item.quantity}" readonly>
+                                            <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post" style="display: inline;">
+                                                <button type="submit" name="quantity" th:value="${item.quantity + 1}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+
+                                    <!-- Total -->
+                                    <td class="text-right align-middle">
+                                        <span class="fw-bold"
+                                            th:text="${#numbers.formatDecimal(item.total, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                    </td>
+
+                                    <!-- Remove Button -->
+                                    <td class="text-center align-middle">
+                                        <form th:action="@{/cart/remove/{id}(id=${item.productId})}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa sản phẩm này?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Continue Shopping Button -->
+                    <div class="mt-3">
+                        <a href="/products" class="btn btn-light border">
+                            <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+                        </a>
+                        <form th:action="@{/cart/clear}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Xóa toàn bộ giỏ hàng?')">
+                                <i class="fas fa-trash"></i> Xóa tất cả
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Summary Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm" style="position: sticky; top: 20px;">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Tóm tắt đơn hàng</h5>
+
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span>Tổng sản phẩm:</span>
+                                <span class="fw-bold" th:text="${totalQuantity} + ' sản phẩm'"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span>Tiền hàng:</span>
+                                <span class="fw-bold" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span>Phí vận chuyển:</span>
+                                <span class="fw-bold text-success">Miễn phí</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="fw-bold">Tổng cộng:</span>
+                                <span class="fw-bold text-danger" style="font-size: 1.2rem;"
+                                    th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+
+                            <button class="btn btn-danger w-100 py-2 mb-2">
+                                <i class="fas fa-credit-card"></i> Thanh toán ngay
+                            </button>
+                            <button class="btn btn-outline-secondary w-100 py-2">
+                                <i class="fas fa-money-bill-wave"></i> Thanh toán sau
+                            </button>
+
+                            <!-- Trust Badges -->
+                            <div class="mt-4 pt-3 border-top text-center" style="font-size: 12px;">
+                                <div class="mb-2">
+                                    <i class="fas fa-shield-alt text-success"></i>
+                                    <span class="ms-2">Mua hàng an toàn</span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-undo text-info"></i>
+                                    <span class="ms-2">Hoàn tiền 100% nếu không hài lòng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .table th {
+                font-weight: 600;
+                color: #333;
+                padding: 15px;
+            }
+
+            .table td {
+                padding: 15px;
+                vertical-align: middle;
+            }
+
+            .btn-outline-secondary:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            @media (max-width: 768px) {
+                .table {
+                    font-size: 12px;
+                }
+
+                .table th,
+                .table td {
+                    padding: 8px;
+                }
+
+                .card {
+                    position: static !important;
+                    margin-top: 20px;
+                }
+            }
+        </style>
+    </div>
+</body>
+
+</html>
