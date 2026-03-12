@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+
+<head>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-end align-items-center mb-3">
+            <!-- Removed header text as requested -->
+            <div>
+                <a href="/categories/add" class="btn btn-light border me-2"><i class="fas fa-folder-plus"></i> Thêm danh
+                    mục</a>
+                <a href="/products/add" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+            </div>
+        </div>
+
+        <!-- Flash Sale Banner -->
+        <div class="container mb-4">
+            <div class="bg-white rounded-4 p-2 d-flex align-items-center justify-content-between shadow-sm"
+                style="max-width: 800px; margin: 0 auto; min-height: 80px;">
+                <div class="d-flex align-items-center bg-danger text-white rounded-4 px-3 py-2"
+                    style="gap: 10px; height: 100%;">
+                    <span class="fw-bold small text-nowrap">Chỉ còn:</span>
+                    <div class="d-flex gap-1 fw-bold fs-5">
+                        <span class="bg-white text-danger px-2 rounded">01</span>:
+                        <span class="bg-white text-danger px-2 rounded">04</span>:
+                        <span class="bg-white text-danger px-2 rounded">18</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-around flex-grow-1 text-center text-muted" style="font-size: 13px;">
+                    <div>
+                        <div>Sắp diễn ra</div>
+                        <div class="fw-bold fs-5 text-dark">12:00</div>
+                    </div>
+                    <div>
+                        <div>Sắp diễn ra</div>
+                        <div class="fw-bold fs-5 text-dark">15:00</div>
+                    </div>
+                    <div>
+                        <div>Sắp diễn ra</div>
+                        <div class="fw-bold fs-5 text-dark">18:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-2">
+            <div class="col" th:each="product : ${products}">
+                <div class="card h-100 border-0 shadow-sm product-card"
+                    style="border-radius: 4px; overflow: hidden; position: relative;">
+                    <!-- Hover Actions (Edit/Delete) -->
+                    <div class="action-buttons position-absolute top-0 end-0 p-2" style="z-index: 10; display: none;">
+                        <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-primary me-1"
+                            title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-sm btn-danger"
+                            title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+
+                    <!-- Badge: Installment 0% (Static for demo) -->
+                    <div
+                        style="position: absolute; top: 0; left: 0; background-color: #f1f1f1; font-size: 10px; padding: 2px 5px; border-bottom-right-radius: 4px;">
+                        Trả góp 0%
+                    </div>
+
+                    <!-- Product Image -->
+                    <div class="text-center p-2">
+                        <img th:src="@{${product.image != null ? product.image : 'https://placehold.co/160x160'}}"
+                            class="card-img-top" alt="Product Image"
+                            style="max-height: 160px; width: auto; object-fit: contain;">
+                    </div>
+
+                    <div class="card-body p-2 d-flex flex-column">
+                        <!-- Name -->
+                        <h6 class="card-title text-primary mb-1"
+                            style="font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px;">
+                            <a th:href="@{/products/edit/{id}(id=${product.id})}" class="text-decoration-none text-dark"
+                                th:text="${product.name}">Samsung Galaxy A54 5G</a>
+                        </h6>
+
+                        <!-- Option badge (Static) -->
+                        <div class="mb-1">
+                            <span class="badge bg-light text-dark border fw-normal"
+                                style="font-size: 10px;">8GB/128GB</span>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="mt-auto">
+                            <!-- Discounted Price (Main) -->
+                            <div class="text-danger fw-bold" style="font-size: 14px;"
+                                th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                                10.490.000₫
+                            </div>
+
+                            <!-- Original Price & Discount (Static Simulation) -->
+                            <div class="d-flex align-items-center" style="font-size: 11px;">
+                                <span class="text-decoration-line-through text-muted me-1"
+                                    th:text="${#numbers.formatDecimal(product.price * 1.1, 0, 'COMMA', 0, 'POINT')} + '₫'">11.490.000₫</span>
+                                <span class="text-danger">-10%</span>
+                            </div>
+
+                            <!-- Rating (Static) -->
+                            <div class="text-warning my-1" style="font-size: 10px;">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="text-muted">(123)</span>
+                            </div>
+
+                            <!-- Progress Bar "Con 9/10 suat" -->
+                            <div class="position-relative mt-2"
+                                style="background-color: #ffd400; border-radius: 10px; height: 18px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <div
+                                    style="position: absolute; left: 0; top: 0; bottom: 0; width: 80%; background: linear-gradient(90deg, #ffecb3, #ffca28); opacity: 0.5;">
+                                </div>
+                                <div style="position: absolute; left: 5px; color: #d01c24; font-size: 12px;"><i
+                                        class="fas fa-fire-alt"></i></div>
+                                <span style="position: relative; font-size: 10px; font-weight: bold; color: #333;">Còn
+                                    9/10 suất</span>
+                            </div>
+
+                            <!-- Buy Now Button -->
+                            <a href="#" class="btn btn-outline-primary w-100 mt-2 py-1"
+                                style="font-size: 12px; border-radius: 4px;">
+                                Mua ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Simple script to handle hover effects if CSS alone isn't preferred, 
+                // but CSS :hover is better. Adding style tag in head via layout or inline here.
+            </script>
+            <style>
+                .product-card:hover .action-buttons {
+                    display: block !important;
+                }
+
+                .product-card:hover {
+                    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+                    transform: translateY(-2px);
+                    transition: all 0.2s;
+                }
+            </style>
+
+            <!-- Example Static Cards to fill grid if empty (for visualization) -->
+            <div class="col" th:if="${#lists.isEmpty(products)}">
+                <div class="card h-100 border-0 shadow-sm p-2 text-center">
+                    <p class="text-muted">Chưa có sản phẩm nào.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

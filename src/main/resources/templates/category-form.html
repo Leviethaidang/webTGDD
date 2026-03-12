@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+
+<head>
+    <title>Thêm Danh Mục</title>
+</head>
+
+<body>
+
+    <div th:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                        <h3 class="card-title fw-bold mb-0">Thêm Danh Mục Mới</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/categories/add}" th:object="${category}" method="post">
+
+                            <div class="mb-4">
+                                <label for="name" class="form-label fw-semibold">Tên danh mục</label>
+                                <input type="text" class="form-control form-control-lg" id="name" th:field="*{name}"
+                                    placeholder="Ví dụ: Máy tính bảng" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}"
+                                    th:errors="*{name}">Lỗi tên</div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/products" class="btn btn-light me-md-2">Hủy bỏ</a>
+                                <button type="submit" class="btn btn-warning px-5 fw-bold text-dark"
+                                    style="background-color: #fed700; border-color: #fed700;">Lưu danh mục</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
